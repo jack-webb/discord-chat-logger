@@ -1,4 +1,4 @@
-### Chat Logger
+### Discord Chat Logger
 _Log Discord messages, edits and deletions_
 
 #### Requirements and setup
