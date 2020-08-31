@@ -1,10 +1,8 @@
-token = ""  # Your bot's token
-default_format = "txt"  # Default log output format. "txt" or "csv"
-debug = False  # Enables debug mode
-verbose = False   # Enables verbose output
-database = {  # postgresql config
-    "name": "name",
-    "user": "",
-    "password": "",
+token = ""  # Your bot token
+default_format = "txt"  # Default log output format "txt" or "csv"
+database = {
+    "name": "",  # POSTGRES_DB
+    "user": "",  # POSTGRES_USER
+    "password": "",  # POSTGRES_PASSWORD
     "host": ""
 }
