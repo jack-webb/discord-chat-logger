@@ -1,13 +1,12 @@
 import discord
-import config
+import datetime
 from logger.models import TextChannel, User, Message, MessageContent, database
 
 
 def setup_database():
     database.connect()
     with database:
-        if config.debug:
-            database.drop_tables([TextChannel, User, MessageContent, Message])
+        database.drop_tables([TextChannel, User, MessageContent, Message])
         database.create_tables([TextChannel, User, MessageContent, Message])
 
 
@@ -15,7 +14,7 @@ def log_message(message: discord.Message):
     user, _ = User.get_or_create(
         id=message.author.id,
         defaults={
-            "name": message.author.name,
+            "username": message.author.name,
             "discriminator": message.author.discriminator,
             "nickname": message.author.display_name
         })
@@ -28,14 +27,21 @@ def log_message(message: discord.Message):
     msg, _ = Message.get_or_create(
         id=message.id,
         defaults={
-            "created_at": message.created_at,
             "author": user,
             "channel": text_channel,
+            "timestamp": message.created_at,
             "jump_url": message.jump_url
         })
 
     MessageContent.create(
         message_id=msg,
         timestamp=message.created_at,
-        content=message.clean_content
+        text=message.clean_content
     )
+
+
+def get_messages_from_channel(channel_id: str, date: datetime.date = datetime.date.today(), include_edits: bool = False):
+    channel = TextChannel.get_by_id(channel_id)
+    if include_edits:
+        return Message.select().where(Message.channel == channel)
+    return Message.select().where((Message.channel == channel) & (Message.timestamp == date)).prefetch()

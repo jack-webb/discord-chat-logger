@@ -31,9 +31,9 @@ class TextChannel(BaseModel):
 
 class User(BaseModel):
     id = BigIntegerField(primary_key=True)
+    username = CharField()
     discriminator = CharField()
     nickname = CharField()
-    name = CharField()
 
     class Meta:
         table_name = 'users'
@@ -43,7 +43,7 @@ class Message(BaseModel):
     id = BigIntegerField(primary_key=True)
     author = ForeignKeyField(column_name='author_id', model=User)
     channel = ForeignKeyField(column_name='channel_id', model=TextChannel)
-    created_at = DateTimeField()
+    timestamp = DateTimeField()
     jump_url = CharField()
 
     class Meta:
@@ -51,9 +51,9 @@ class Message(BaseModel):
 
 
 class MessageContent(BaseModel):
-    content = CharField()
-    message = ForeignKeyField(column_name='message_id', model=Message, backref="contents")
+    message = ForeignKeyField(column_name='message_id', model=Message, backref="content")
     timestamp = DateTimeField()
+    text = CharField()
 
     class Meta:
         table_name = 'message_contents'
