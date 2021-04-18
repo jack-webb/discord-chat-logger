@@ -9,6 +9,7 @@ verify_ssl = true
 discord.py = "*"
 peewee = "*"
 psycopg2-binary = "*"
+babel = "*"
 
 [requires]
-python_version = "3.8"
+python_version = "3.9"

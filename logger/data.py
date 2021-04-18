@@ -33,15 +33,41 @@ def log_message(message: discord.Message):
             "jump_url": message.jump_url
         })
 
+    attachment = ""
+    try:
+        attachment = message.attachments[0].proxy_url
+    except IndexError:
+        pass  # Ignore, just means we don't have an attachment
+
     MessageContent.create(
         message_id=msg,
-        timestamp=message.created_at,
-        text=message.clean_content
+        timestamp=message.edited_at or message.created_at,
+        text=message.clean_content,
+        attachment_url=attachment
     )
 
 
-def get_messages_from_channel(channel_id: str, date: datetime.date = datetime.date.today(), include_edits: bool = False):
+def update_user(user: discord.Member):
+    User.update(
+        username=user.name,
+        discriminator=user.discriminator,
+        nickname=user.display_name
+    ).where(
+        User.id == user.id
+    ).execute()
+
+
+def get_messages_from_channel(channel_id: str, date: datetime.date = datetime.datetime.now(),
+                              include_edits: bool = False):
     channel = TextChannel.get_by_id(channel_id)
+    past_day_timestamp = date - datetime.timedelta(days=1)
     if include_edits:
-        return Message.select().where(Message.channel == channel)
-    return Message.select().where((Message.channel == channel) & (Message.timestamp == date)).prefetch()
+        return Message \
+            .select() \
+            .where((Message.channel == channel) & (Message.timestamp >= past_day_timestamp)) \
+            .order_by(Message.timestamp)
+    return Message \
+        .select() \
+        .where((Message.channel == channel) & (Message.timestamp >= past_day_timestamp)) \
+        .order_by(Message.timestamp) \
+        .prefetch()

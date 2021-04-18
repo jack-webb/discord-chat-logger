@@ -1,12 +1,6 @@
 import os
 import config
-from peewee import Model, CharField, ForeignKeyField, DateTimeField, PostgresqlDatabase, BigIntegerField
-
-# DATABASE = os.path.join(
-#     os.path.dirname(os.path.realpath(__file__)),
-#     'logger.db'
-# )
-# DATABASE_PRAGMAS = {'foreign_keys': 1}
+from peewee import Model, CharField, ForeignKeyField, DateTimeField, PostgresqlDatabase, SqliteDatabase, BigIntegerField
 
 database = PostgresqlDatabase(
     config.database['name'],
@@ -54,6 +48,7 @@ class MessageContent(BaseModel):
     message = ForeignKeyField(column_name='message_id', model=Message, backref="content")
     timestamp = DateTimeField()
     text = CharField()
+    attachment_url = CharField(null=True)
 
     class Meta:
         table_name = 'message_contents'
