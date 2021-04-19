@@ -10,6 +10,7 @@ def setup_database():
         database.create_tables([TextChannel, User, MessageContent, Message])
 
 
+# todo error handling
 def log_message(message: discord.Message):
     user, _ = User.get_or_create(
         id=message.author.id,
@@ -39,6 +40,7 @@ def log_message(message: discord.Message):
     except IndexError:
         pass  # Ignore, just means we don't have an attachment
 
+    # TODO embeds just show as an empty message, should probably ignore them on account of normal users not having access to them
     MessageContent.create(
         message_id=msg,
         timestamp=message.edited_at or message.created_at,

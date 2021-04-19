@@ -1,6 +1,6 @@
-import os
 import config
-from peewee import Model, CharField, ForeignKeyField, DateTimeField, PostgresqlDatabase, SqliteDatabase, BigIntegerField
+from peewee import Model, CharField, ForeignKeyField, DateTimeField, PostgresqlDatabase, SqliteDatabase, \
+    BigIntegerField, TextField
 
 database = PostgresqlDatabase(
     config.database['name'],
@@ -47,7 +47,7 @@ class Message(BaseModel):
 class MessageContent(BaseModel):
     message = ForeignKeyField(column_name='message_id', model=Message, backref="content")
     timestamp = DateTimeField()
-    text = CharField()
+    text = TextField()
     attachment_url = CharField(null=True)
 
     class Meta:
