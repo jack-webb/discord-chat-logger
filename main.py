@@ -9,8 +9,9 @@ import logging
 from babel.dates import format_timedelta
 
 import config
-from logger import data, models
-from logger.models import MessageContent
+import data
+import models
+from models import MessageContent
 
 logging.basicConfig(level=logging.DEBUG)
 

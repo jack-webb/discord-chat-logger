@@ -1,6 +1,6 @@
 import discord
 import datetime
-from logger.models import TextChannel, User, Message, MessageContent, database
+from models import TextChannel, User, Message, MessageContent, database
 
 
 def setup_database():
