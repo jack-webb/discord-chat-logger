@@ -100,5 +100,5 @@ def error(message: str):
 
 
 if __name__ == "__main__":
-    # data.setup_database()
+    data.setup_database()
     bot.run(config.token)
