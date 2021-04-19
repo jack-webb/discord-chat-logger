@@ -5,9 +5,9 @@ from logger.models import TextChannel, User, Message, MessageContent, database
 
 def setup_database():
     database.connect()
-    with database:
-        database.drop_tables([TextChannel, User, MessageContent, Message])
-        database.create_tables([TextChannel, User, MessageContent, Message])
+    # with database:
+    #     database.drop_tables([TextChannel, User, MessageContent, Message])
+    #     database.create_tables([TextChannel, User, MessageContent, Message])
 
 
 # todo error handling
@@ -59,8 +59,7 @@ def update_user(user: discord.Member):
     ).execute()
 
 
-def get_messages_from_channel(channel_id: str, date: datetime.date = datetime.datetime.now(),
-                              include_edits: bool = False):
+def get_messages_from_channel(channel_id: str, date: datetime.date, include_edits: bool = False):
     channel = TextChannel.get_by_id(channel_id)
     past_day_timestamp = date - datetime.timedelta(days=1)
     if include_edits:
