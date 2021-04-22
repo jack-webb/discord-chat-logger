@@ -15,7 +15,7 @@ from models import MessageContent
 
 logging.basicConfig(level=logging.DEBUG)
 
-description = "blah"
+description = "blah"  # todo
 
 intents = discord.Intents.default()
 intents.members = True
@@ -43,7 +43,8 @@ async def get_log_file(ctx: commands.Context, channel: discord.TextChannel, date
 
     messages = data.get_messages_from_channel(channel.id, date)
     file = create_log_file(messages)
-    await ctx.channel.send(file=discord.File(file, filename=f"{ctx.guild.name}-{channel.name}-{date.strftime('%Y-%m-%d')}-log.txt"))
+    await ctx.channel.send(
+        file=discord.File(file, filename=f"{ctx.guild.name}-{channel.name}-{date.strftime('%Y-%m-%d')}-log.txt"))
 
 
 @bot.listen("on_message")
@@ -83,6 +84,28 @@ def process_message_out(message: models.Message):
     return output
 
 
+# region timing
+
+from functools import wraps
+from time import time
+
+
+def measure(func):
+    @wraps(func)
+    def _time_it(*args, **kwargs):
+        start = int(round(time() * 1000))
+        try:
+            return func(*args, **kwargs)
+        finally:
+            end_ = int(round(time() * 1000)) - start
+            print(f"Total execution time: {end_ if end_ > 0 else 0} ms")
+
+    return _time_it
+
+
+# endregion timing
+
+@measure
 def create_log_file(messages: List[models.Message]):
     s = io.StringIO()
 
