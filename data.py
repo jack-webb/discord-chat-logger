@@ -10,7 +10,7 @@ def setup_database():
     #     database.create_tables([TextChannel, User, MessageContent, Message])
 
 
-# todo error handling
+# todo Error handling
 def log_message(message: discord.Message):
     user, _ = User.get_or_create(
         id=message.author.id,
