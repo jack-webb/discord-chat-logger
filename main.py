@@ -90,7 +90,7 @@ def create_log_file(messages: List[models.Message]):
         s.write(process_message_out(message))
         s.write("\n")
 
-    s.seek(0)  # Seek back to the beginning ready to send
+    s.seek(0) 
 
     return s
 
