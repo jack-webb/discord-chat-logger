@@ -59,26 +59,21 @@ async def update_member(before: discord.Member, after: discord.Member):
                   "the form #channel. Optionally provide a date (YYYY-MM-DD), otherwise get today's logs.",
              usage="channel date"
              )
-async def get_log_file(ctx: commands.Context, channel: discord.TextChannel, date_str: Optional[str] = None):
-    if date_str is None:
-        date = datetime.now()
-    else:
-        try:
-            date = datetime.strptime(date_str, "%Y-%m-%d").date()
-        except ValueError as e:
-            await ctx.channel.send(f"Invalid date. Dates should be formatted as YYYY-MM-DD.")
-
+async def get_log_file(ctx: commands.Context, channel: discord.TextChannel, date_str: Optional[str] = datetime.now().strftime('%Y-%m-%d')):
     try:
+        date = datetime.strptime(date_str, "%Y-%m-%d").date()
         messages = data.get_messages_from_channel(channel.id, date)
         file = create_log_file(messages)
         await ctx.channel.send(
             file=discord.File(file, filename=f"{ctx.guild.name}-{channel.name}-{date.strftime('%Y-%m-%d')}-log.txt")
         )
+    except ValueError:
+        await ctx.channel.send(f"Invalid date. Dates should be formatted as YYYY-MM-DD.")
     except IndexError:
         await ctx.channel.send(f"No messages available for {channel.mention} on {date.strftime('%Y-%m-%d')}")
 
 
-# todo Is there an erorr-specific way to handle this? Or a better way to handle params?
+# todo Is there an error-specific way to handle this? Or a better way to handle params?
 @bot.listen("on_command_error")
 async def on_command_error(ctx: commands.Context, error: commands.CommandError):
     if isinstance(error, commands.MissingRequiredArgument):
