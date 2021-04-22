@@ -59,16 +59,10 @@ def update_user(user: discord.Member):
     ).execute()
 
 
-def get_messages_from_channel(channel_id: str, date: datetime.date, include_edits: bool = False):
+def get_messages_from_channel(channel_id: str, date: datetime.date):
     channel = TextChannel.get_by_id(channel_id)
     past_day_timestamp = date - datetime.timedelta(days=1)
-    if include_edits:
-        return Message \
-            .select() \
-            .where((Message.channel == channel) & (Message.timestamp >= past_day_timestamp)) \
-            .order_by(Message.timestamp)
     return Message \
         .select() \
-        .where((Message.channel == channel) & (Message.timestamp >= past_day_timestamp)) \
-        .order_by(Message.timestamp) \
-        .prefetch()
+        .where((Message.channel == channel) & (Message.timestamp <= past_day_timestamp)) \
+        .order_by(Message.timestamp)
