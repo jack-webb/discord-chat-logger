@@ -34,7 +34,11 @@ async def on_ready():
     print("=====================")
 
 
-@bot.command(name="logs")
+@bot.command(name="logs", brief="Get chat logs for a given text channel",
+             help="Retrieve one day's chat logs, including edit history, for a text channel. Provide the channel in "
+                  "the form #channel. Optionally provide a date (YYYY-MM-DD), otherwise get today's logs.",
+             usage="channel date"
+             )
 async def get_log_file(ctx: commands.Context, channel: discord.TextChannel, date_str: Optional[str] = None):
     if date_str is None:
         date = datetime.now()
@@ -90,7 +94,7 @@ def create_log_file(messages: List[models.Message]):
         s.write(process_message_out(message))
         s.write("\n")
 
-    s.seek(0) 
+    s.seek(0)
 
     return s
 
