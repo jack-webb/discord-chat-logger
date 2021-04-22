@@ -15,7 +15,7 @@ from models import MessageContent
 
 logging.basicConfig(level=logging.DEBUG)
 
-description = "blah"  # todo
+description = config.description
 
 intents = discord.Intents.default()
 intents.members = True

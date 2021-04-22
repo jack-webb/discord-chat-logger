@@ -1,6 +1,7 @@
 token = ""  # Your bot token
 prefix = ""  # Prefix for bot commands
 log_channel = ""  # The ID of the channel the bot listens to for log requests
+description = "Logging chat messages"  # A description of the bot
 database = {
     "name": "",  # POSTGRES_DB
     "user": "",  # POSTGRES_USER
