@@ -54,6 +54,7 @@ async def update_member(before: discord.Member, after: discord.Member):
         data.update_user(after)
 
 
+# todo Add a loading message for long-running operations
 @bot.command(name="logs", brief="Get chat logs for a given text channel",
              help="Retrieve one day's chat logs, including edit history, for a text channel. Provide the channel in "
                   "the form #channel. Optionally provide a date (YYYY-MM-DD), otherwise get today's logs.",
