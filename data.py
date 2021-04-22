@@ -40,7 +40,7 @@ def log_message(message: discord.Message):
     except IndexError:
         pass  # Ignore, just means we don't have an attachment
 
-    # TODO embeds just show as an empty message, should probably ignore them on account of normal users not having access to them
+    # todo Embeds show as an empty message - this needs better handling
     MessageContent.create(
         message_id=msg,
         timestamp=message.edited_at or message.created_at,
@@ -58,7 +58,7 @@ def update_user(user: discord.Member):
         User.id == user.id
     ).execute()
 
-
+# todo Can we make this query more efficient?
 def get_messages_from_channel(channel_id: str, date: datetime.date):
     channel = TextChannel.get_by_id(channel_id)
     return Message \

@@ -65,7 +65,6 @@ async def update_member(before: discord.Member, after: discord.Member):
         data.update_user(after)
 
 
-# todo this is spitting out a shitload of queries - investigate
 def process_message_out(message: models.Message):
     output = ""
 
