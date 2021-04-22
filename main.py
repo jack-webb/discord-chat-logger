@@ -1,4 +1,6 @@
 import io
+import traceback
+
 import sys
 from datetime import datetime
 from typing import List, Optional
@@ -34,23 +36,6 @@ async def on_ready():
     print("=====================")
 
 
-@bot.command(name="logs", brief="Get chat logs for a given text channel",
-             help="Retrieve one day's chat logs, including edit history, for a text channel. Provide the channel in "
-                  "the form #channel. Optionally provide a date (YYYY-MM-DD), otherwise get today's logs.",
-             usage="channel date"
-             )
-async def get_log_file(ctx: commands.Context, channel: discord.TextChannel, date_str: Optional[str] = None):
-    if date_str is None:
-        date = datetime.now()
-    else:
-        date = datetime.strptime(date_str, "%Y-%m-%d").date()
-
-    messages = data.get_messages_from_channel(channel.id, date)
-    file = create_log_file(messages)
-    await ctx.channel.send(
-        file=discord.File(file, filename=f"{ctx.guild.name}-{channel.name}-{date.strftime('%Y-%m-%d')}-log.txt"))
-
-
 @bot.listen("on_message")
 async def log_on_message(message: discord.Message):
     data.log_message(message)
@@ -67,6 +52,43 @@ async def update_member(before: discord.Member, after: discord.Member):
             or before.name != after.name \
             or before.discriminator != after.discriminator:
         data.update_user(after)
+
+
+@bot.command(name="logs", brief="Get chat logs for a given text channel",
+             help="Retrieve one day's chat logs, including edit history, for a text channel. Provide the channel in "
+                  "the form #channel. Optionally provide a date (YYYY-MM-DD), otherwise get today's logs.",
+             usage="channel date"
+             )
+async def get_log_file(ctx: commands.Context, channel: discord.TextChannel, date_str: Optional[str] = None):
+    if date_str is None:
+        date = datetime.now()
+    else:
+        try:
+            date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        except ValueError as e:
+            await ctx.channel.send(f"Invalid date. Dates should be formatted as YYYY-MM-DD.")
+
+    try:
+        messages = data.get_messages_from_channel(channel.id, date)
+        file = create_log_file(messages)
+        await ctx.channel.send(
+            file=discord.File(file, filename=f"{ctx.guild.name}-{channel.name}-{date.strftime('%Y-%m-%d')}-log.txt")
+        )
+    except IndexError:
+        await ctx.channel.send(f"No messages available for {channel.mention} on {date.strftime('%Y-%m-%d')}")
+
+
+# todo Is there an erorr-specific way to handle this? Or a better way to handle params?
+@bot.listen("on_command_error")
+async def on_command_error(ctx: commands.Context, error: commands.CommandError):
+    if isinstance(error, commands.MissingRequiredArgument):
+        if error.param.name == "channel":
+            await ctx.channel.send("You must supply a channel name!")
+    elif isinstance(error, commands.ChannelNotFound):
+        await ctx.channel.send(f"Channel `{error.argument}` not found. Valid channels will autocomplete.")
+    else:
+        print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
+        traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
 
 def process_message_out(message: models.Message):
@@ -87,7 +109,10 @@ def process_message_out(message: models.Message):
     return output
 
 
-def create_log_file(messages: List[models.Message]):
+def create_log_file(messages: List[models.Message]) -> io.StringIO:
+    if len(messages) == 0:
+        raise IndexError
+
     s = io.StringIO()
 
     for message in messages:
@@ -97,11 +122,6 @@ def create_log_file(messages: List[models.Message]):
     s.seek(0)
 
     return s
-
-
-def error(message: str):
-    # Send some error message
-    pass
 
 
 if __name__ == "__main__":
