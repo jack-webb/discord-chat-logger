@@ -58,6 +58,7 @@ def update_user(user: discord.Member):
         User.id == user.id
     ).execute()
 
+
 # todo Can we make this query more efficient?
 def get_messages_from_channel(channel_id: str, date: datetime.date):
     channel = TextChannel.get_by_id(channel_id)
