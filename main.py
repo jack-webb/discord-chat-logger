@@ -1,8 +1,6 @@
 import io
 import traceback
 
-import time
-import timeit
 import sys
 from datetime import datetime
 from typing import List, Optional
@@ -62,6 +60,9 @@ async def update_member(before: discord.Member, after: discord.Member):
              usage="channel date"
              )
 async def get_log_file(ctx: commands.Context, channel: discord.TextChannel, date_str: Optional[str] = datetime.now().strftime('%Y-%m-%d')):
+    if ctx.channel.id != config.log_channel:
+        return
+
     start_time = datetime.now()
 
     try:
