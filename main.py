@@ -62,16 +62,21 @@ async def update_member(before: discord.Member, after: discord.Member):
              )
 async def get_log_file(ctx: commands.Context, channel: discord.TextChannel, date_str: Optional[str] = datetime.now().strftime('%Y-%m-%d')):
     try:
+        loading: discord.Message = await ctx.channel.send("Loading...")
         date = datetime.strptime(date_str, "%Y-%m-%d").date()
         messages = data.get_messages_from_channel(channel.id, date)
-        file = create_log_file(messages)
+        file = create_log_file(messages, date)
+        await loading.delete()
         await ctx.channel.send(
+            content=f"Chat logs for {channel.mention} on {date.strftime('%Y-%m-%d')}",
             file=discord.File(file, filename=f"{ctx.guild.name}-{channel.name}-{date.strftime('%Y-%m-%d')}-log.txt")
         )
+    # todo Remove "reference before assignment" warnings
     except ValueError:
-        await ctx.channel.send(f"Invalid date. Dates should be formatted as YYYY-MM-DD.")
+        await loading.edit(content=f"Invalid date. Dates should be formatted as YYYY-MM-DD.")
     except IndexError:
-        await ctx.channel.send(f"No messages available for {channel.mention} on {date.strftime('%Y-%m-%d')}")
+        await loading.edit(content=f"No messages available for {channel.mention} on {date.strftime('%Y-%m-%d')}")
+    # todo Uncaught errors leave "Loading..." hanging...
 
 
 # todo Is there an error-specific way to handle this? Or a better way to handle params?
@@ -94,9 +99,9 @@ def process_message_out(message: models.Message):
     current, previous = ordered_contents[0], ordered_contents[1:]
 
     if str(message.author.nickname) == f"{message.author.username}":
-        output += f"[{message.timestamp.strftime('%Y-%m-%d %H:%M:%S')}] {message.author.username}#{message.author.discriminator}: {current.text} {current.attachment_url}"
+        output += f"[{message.timestamp.strftime('%H:%M:%S')}] {message.author.username}#{message.author.discriminator}: {current.text} {current.attachment_url}"
     else:
-        output += f"[{message.timestamp.strftime('%Y-%m-%d %H:%M:%S')}] {message.author.username}#{message.author.discriminator} ({message.author.nickname}): {current.text} {current.attachment_url}"
+        output += f"[{message.timestamp.strftime('%H:%M:%S')}] {message.author.username}#{message.author.discriminator} ({message.author.nickname}): {current.text} {current.attachment_url}"
 
     for content in previous:
         relative_time = current.timestamp - content.timestamp
@@ -105,11 +110,13 @@ def process_message_out(message: models.Message):
     return output
 
 
-def create_log_file(messages: List[models.Message]) -> io.StringIO:
+def create_log_file(messages: List[models.Message], date: datetime.date) -> io.StringIO:
     if len(messages) == 0:
         raise IndexError
 
     s = io.StringIO()
+
+    s.write(f"--- Chat logs for #{messages[0].channel.name} on {date.strftime('%Y-%m-%d')} ---\n")
 
     for message in messages:
         s.write(process_message_out(message))
