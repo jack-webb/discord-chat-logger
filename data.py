@@ -1,5 +1,8 @@
 import discord
 import datetime
+
+from peewee import prefetch
+
 from models import TextChannel, User, Message, MessageContent, database
 
 
@@ -59,10 +62,12 @@ def update_user(user: discord.Member):
     ).execute()
 
 
-# todo Can we make this query more efficient?
 def get_messages_from_channel(channel_id: str, date: datetime.date):
     channel = TextChannel.get_by_id(channel_id)
-    return Message \
+    users = User.select()
+    message_contents = MessageContent.select().order_by(MessageContent.timestamp.desc())
+    messages = Message \
         .select() \
         .where((Message.channel == channel) & (Message.timestamp.day == date.day)) \
         .order_by(Message.timestamp)
+    return prefetch(messages, users, message_contents)

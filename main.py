@@ -1,6 +1,8 @@
 import io
 import traceback
 
+import time
+import timeit
 import sys
 from datetime import datetime
 from typing import List, Optional
@@ -13,7 +15,6 @@ from babel.dates import format_timedelta
 import config
 import data
 import models
-from models import MessageContent
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -61,22 +62,31 @@ async def update_member(before: discord.Member, after: discord.Member):
              usage="channel date"
              )
 async def get_log_file(ctx: commands.Context, channel: discord.TextChannel, date_str: Optional[str] = datetime.now().strftime('%Y-%m-%d')):
+    start_time = datetime.now()
+    loading: discord.Message = await ctx.channel.send("Loading...")
+
     try:
-        loading: discord.Message = await ctx.channel.send("Loading...")
         date = datetime.strptime(date_str, "%Y-%m-%d").date()
-        messages = data.get_messages_from_channel(channel.id, date)
-        file = create_log_file(messages, date)
-        await loading.delete()
-        await ctx.channel.send(
-            content=f"Chat logs for {channel.mention} on {date.strftime('%Y-%m-%d')}",
-            file=discord.File(file, filename=f"{ctx.guild.name}-{channel.name}-{date.strftime('%Y-%m-%d')}-log.txt")
-        )
-    # todo Remove "reference before assignment" warnings
     except ValueError:
         await loading.edit(content=f"Invalid date. Dates should be formatted as YYYY-MM-DD.")
+        return
+
+    messages = data.get_messages_from_channel(channel.id, date)
+    try:
+        file = create_log_file(messages, date)
     except IndexError:
         await loading.edit(content=f"No messages available for {channel.mention} on {date.strftime('%Y-%m-%d')}")
-    # todo Uncaught errors leave "Loading..." hanging...
+        return 
+
+    end_time = datetime.now()
+    duration = int((end_time - start_time).microseconds * 0.001)
+
+    await loading.delete()
+    await ctx.channel.send(
+        content=f"Retrieved {len(messages)} messages in {duration}ms.",
+        file=discord.File(file, filename=f"{ctx.guild.name}-{channel.name}-{date.strftime('%Y-%m-%d')}-log.txt")
+    )
+    # todo Remove "reference before assignment" warnings
 
 
 # todo Is there an error-specific way to handle this? Or a better way to handle params?
@@ -95,8 +105,7 @@ async def on_command_error(ctx: commands.Context, error: commands.CommandError):
 def process_message_out(message: models.Message):
     output = ""
 
-    ordered_contents = message.content.order_by(MessageContent.timestamp.desc())
-    current, previous = ordered_contents[0], ordered_contents[1:]
+    current, previous = message.content[0], message.content[1:]
 
     if str(message.author.nickname) == f"{message.author.username}":
         output += f"[{message.timestamp.strftime('%H:%M:%S')}] {message.author.username}#{message.author.discriminator}: {current.text} {current.attachment_url}"
