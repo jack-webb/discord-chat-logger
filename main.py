@@ -63,25 +63,23 @@ async def update_member(before: discord.Member, after: discord.Member):
              )
 async def get_log_file(ctx: commands.Context, channel: discord.TextChannel, date_str: Optional[str] = datetime.now().strftime('%Y-%m-%d')):
     start_time = datetime.now()
-    loading: discord.Message = await ctx.channel.send("Loading...")
 
     try:
         date = datetime.strptime(date_str, "%Y-%m-%d").date()
     except ValueError:
-        await loading.edit(content=f"Invalid date. Dates should be formatted as YYYY-MM-DD.")
+        await ctx.channel.send(content=f"Invalid date. Dates should be formatted as YYYY-MM-DD.")
         return
 
     messages = data.get_messages_from_channel(channel.id, date)
     try:
         file = create_log_file(messages, date)
     except IndexError:
-        await loading.edit(content=f"No messages available for {channel.mention} on {date.strftime('%Y-%m-%d')}")
-        return 
+        await ctx.channel.send(content=f"No messages available for {channel.mention} on {date.strftime('%Y-%m-%d')}")
+        return
 
     end_time = datetime.now()
     duration = int((end_time - start_time).microseconds * 0.001)
 
-    await loading.delete()
     await ctx.channel.send(
         content=f"Retrieved {len(messages)} messages in {duration}ms.",
         file=discord.File(file, filename=f"{ctx.guild.name}-{channel.name}-{date.strftime('%Y-%m-%d')}-log.txt")
