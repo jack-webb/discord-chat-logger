@@ -11,7 +11,6 @@ from discord.ext import commands
 import logging
 from babel.dates import format_timedelta
 
-import models
 from FlatDataSource import FlatDataSource
 
 logging.basicConfig(level=logging.DEBUG)
@@ -95,40 +94,6 @@ async def on_command_error(ctx: commands.Context, error: commands.CommandError):
     else:
         print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
         traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
-
-
-def process_message_out(message: models.Message):
-    output = ""
-
-    current, previous = message.content[0], message.content[1:]
-
-    if str(message.author.nickname) == f"{message.author.username}":
-        output += f"[{message.timestamp.strftime('%H:%M:%S')}] {message.author.username}#{message.author.discriminator}: {current.text} {current.attachment_url}"
-    else:
-        output += f"[{message.timestamp.strftime('%H:%M:%S')}] {message.author.username}#{message.author.discriminator} ({message.author.nickname}): {current.text} {current.attachment_url}"
-
-    for content in previous:
-        relative_time = current.timestamp - content.timestamp
-        output += f"\n↪ {format_timedelta(relative_time, locale='en_US')} ago: {content.text} {content.attachment_url}"
-
-    return output
-
-
-def create_log_file(messages: List[models.Message], date: datetime.date) -> io.StringIO:
-    if len(messages) == 0:
-        raise IndexError
-
-    s = io.StringIO()
-
-    s.write(f"--- Chat logs for #{messages[0].channel.name} on {date.strftime('%Y-%m-%d')} ---\n")
-
-    for message in messages:
-        s.write(process_message_out(message))
-        s.write("\n")
-
-    s.seek(0)
-
-    return s
 
 
 if __name__ == "__main__":
