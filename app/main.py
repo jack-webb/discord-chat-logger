@@ -11,7 +11,6 @@ from discord.ext import commands
 import logging
 from babel.dates import format_timedelta
 
-import config
 import models
 from FlatDataSource import FlatDataSource
 
