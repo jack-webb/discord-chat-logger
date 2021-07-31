@@ -1,13 +1,9 @@
-import os
-from typing import List, BinaryIO
+from typing import List
 
 import discord
 import datetime
 
-from peewee import prefetch
-
 from DataSource import DataSource
-from models import TextChannel, User, Message, MessageContent, database
 
 
 class FlatDataSource(DataSource):
