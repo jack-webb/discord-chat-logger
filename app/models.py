@@ -1,6 +1,5 @@
 import config
-from peewee import Model, CharField, ForeignKeyField, DateTimeField, PostgresqlDatabase, SqliteDatabase, \
-    BigIntegerField, TextField
+from peewee import Model, CharField, ForeignKeyField, DateTimeField, PostgresqlDatabase, BigIntegerField, TextField
 
 database = PostgresqlDatabase(
     config.database['name'],
@@ -8,7 +7,6 @@ database = PostgresqlDatabase(
     password=config.database['password'],
     host=config.database['host']
 )
-
 
 class BaseModel(Model):
     class Meta:

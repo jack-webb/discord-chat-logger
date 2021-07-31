@@ -1,6 +1,8 @@
 ### Discord Chat Logger
 _Log Discord messages, edits and deletions_
 
+The primary branch on this project (`master`) is not stable, and is not recommended for use. It contains undocumented breaking changes. Use the latest version from [releases](https://github.com/jack-webb/discord-chat-logger/releases) instead.
+
 #### Requirements and setup
 _Requires Python 3.5.3 (or above) and Pipenv_
 1. Install dependencies with `pipenv install` 
