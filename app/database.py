@@ -3,20 +3,21 @@ import datetime
 
 from peewee import prefetch
 
-from DataSource import DataSource
 from models import TextChannel, User, Message, MessageContent, database
 
 
-class PeeweeDataSource(DataSource):
+class PeeweeDataSource:
     def setup_database(self):
         # create file
         database.connect()
         # with database:
         #     database.drop_tables([TextChannel, User, MessageContent, Message])
         #     database.create_tables([TextChannel, User, MessageContent, Message])
+        database.close()
 
     # todo Error handling
     def log_message(self, message: discord.Message):
+        database.connect()
         user, _ = User.get_or_create(
             id=message.author.id,
             defaults={
@@ -53,7 +54,10 @@ class PeeweeDataSource(DataSource):
             attachment_url=attachment
         )
 
+        database.close()
+
     def update_user(self, user: discord.Member):
+        database.connect()
         User.update(
             username=user.name,
             discriminator=user.discriminator,
@@ -61,6 +65,7 @@ class PeeweeDataSource(DataSource):
         ).where(
             User.id == user.id
         ).execute()
+        database.close()
 
     def get_messages_from_channel(self, channel_id: str, date: datetime.date):
         channel = TextChannel.get_by_id(channel_id)
@@ -71,4 +76,3 @@ class PeeweeDataSource(DataSource):
             .where((Message.channel == channel) & (Message.timestamp.day == date.day)) \
             .order_by(Message.timestamp)
         return prefetch(messages, users, message_contents)
-    # todo rewrite to return common value - bytes? use a formatter here (or make a separate class)

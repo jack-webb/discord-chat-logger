@@ -11,7 +11,7 @@ from discord.ext import commands
 import logging
 from babel.dates import format_timedelta
 
-from FlatDataSource import FlatDataSource
+from database import PeeweeDataSource
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -22,7 +22,7 @@ intents.members = True
 
 bot = commands.Bot(command_prefix=os.getenv("PREFIX", default="!"), description=description, intents=intents)
 
-data_source = FlatDataSource()
+data_source = PeeweeDataSource()
 
 
 @bot.event
