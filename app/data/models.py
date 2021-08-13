@@ -1,9 +1,8 @@
 import os
 
-import config
 from peewee import Model, CharField, ForeignKeyField, DateTimeField, SqliteDatabase, BigIntegerField, TextField
 
-database = SqliteDatabase(os.path.join("database", "chat-logger.db"))
+database = SqliteDatabase(os.path.join("app", "database", "chat-logger.db"))
 
 
 class BaseModel(Model):

@@ -1,6 +1,8 @@
 app/config.py
 *.iml
 .idea/
+database/
+database/*
 
 # --------------
 

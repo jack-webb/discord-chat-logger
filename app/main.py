@@ -4,14 +4,13 @@ import os
 
 import sys
 from datetime import datetime
-from typing import List, Optional, BinaryIO
+from typing import Optional
 
 import discord
 from discord.ext import commands
 import logging
-from babel.dates import format_timedelta
 
-from database import PeeweeDataSource
+from data.database import PeeweeDataSource
 
 logging.basicConfig(level=logging.DEBUG)
 

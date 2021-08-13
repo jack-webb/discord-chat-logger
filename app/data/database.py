@@ -3,7 +3,7 @@ import datetime
 
 from peewee import prefetch
 
-from models import TextChannel, User, Message, MessageContent, database
+from data.models import TextChannel, User, Message, MessageContent, database
 
 
 class PeeweeDataSource:

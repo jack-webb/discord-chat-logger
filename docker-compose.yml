@@ -1,0 +1,11 @@
+---
+version: "3.3"
+services:
+  overview:
+    restart: always
+    image: chat-logger:latest
+    container_name: chat-logger
+    env_file:
+      - .env
+    volumes:
+      - ./app/database:/app/app/database
