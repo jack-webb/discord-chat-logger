@@ -1,12 +1,10 @@
-import config
-from peewee import Model, CharField, ForeignKeyField, DateTimeField, PostgresqlDatabase, BigIntegerField, TextField
+import os
 
-database = PostgresqlDatabase(
-    config.database['name'],
-    user=config.database['user'],
-    password=config.database['password'],
-    host=config.database['host']
-)
+import config
+from peewee import Model, CharField, ForeignKeyField, DateTimeField, SqliteDatabase, BigIntegerField, TextField
+
+database = SqliteDatabase(os.path.join("database", "chat-logger.db"))
+
 
 class BaseModel(Model):
     class Meta:
