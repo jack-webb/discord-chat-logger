@@ -18,7 +18,6 @@ class PeeweeDataSource:
 
     # todo Error handling
     def log_message(self, message: discord.Message):
-        database.connect()
         user, _ = User.get_or_create(
             id=message.author.id,
             defaults={
@@ -55,10 +54,7 @@ class PeeweeDataSource:
             attachment_url=attachment
         )
 
-        database.close()
-
     def update_user(self, user: discord.Member):
-        database.connect()
         User.update(
             username=user.name,
             discriminator=user.discriminator,
@@ -66,7 +62,6 @@ class PeeweeDataSource:
         ).where(
             User.id == user.id
         ).execute()
-        database.close()
 
     def create_log_file(self, messages: List[Message], date: datetime.date) -> io.StringIO:
         if len(messages) == 0:
