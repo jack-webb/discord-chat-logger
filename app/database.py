@@ -8,11 +8,8 @@ from models import TextChannel, User, Message, MessageContent, database
 
 class PeeweeDataSource:
     def setup_database(self):
-        # create file
         database.connect()
-        # with database:
-        #     database.drop_tables([TextChannel, User, MessageContent, Message])
-        #     database.create_tables([TextChannel, User, MessageContent, Message])
+        database.create_tables([TextChannel, User, Message, MessageContent], safe=True)
         database.close()
 
     # todo Error handling
