@@ -83,7 +83,7 @@ class PeeweeDataSource:
     def process_message_out(self, message: Message):
         output = ""
 
-        ordered_contents = reversed(sorted(message.content, key=lambda x: x.timestamp))
+        ordered_contents = list(reversed(sorted(message.content, key=lambda x: x.timestamp)))
         current, previous = ordered_contents[0], ordered_contents[1:]
 
         if str(message.author.nickname) == f"{message.author.username}":
