@@ -6,6 +6,8 @@ The primary branch on this project (`master`) is not stable, and is not recommen
 Use the latest version from [releases](https://github.com/jack-webb/discord-chat-logger/releases) instead.
 
 #### Requirements and setup
+**Out of date - use environment variables instead. See main.py.**
+
 _Requires Python 3.5.3 (or above) and Pipenv_
 1. Install dependencies with `pipenv install` 
 2. Copy `config.example.py` to `config.py` and add your bot token and database details.
