@@ -71,10 +71,11 @@ async def get_log_file(ctx: commands.Context, channel: discord.TextChannel,
         return
 
     try:
-        log_bytes = data_source.get_bytes(channel.id, date)
+        messages = data_source.get_messages_from_channel(channel.id, date)
+        file = data_source.create_log_file(messages, date)
         await ctx.channel.send(
             content=f"Logs for {channel.name} on {date.strftime('%Y-%m-%d')}:",
-            file=discord.File(io.BytesIO(log_bytes), filename="file.txt")
+            file=discord.File(file, filename="file.txt")
         )
     except:
         await ctx.channel.send("Could not retrieve logs. Are you using the right channel? Is the date correctly "
