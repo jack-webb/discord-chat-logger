@@ -72,7 +72,9 @@ async def get_log_file(ctx: commands.Context, channel: discord.TextChannel,
 
     # try:
     messages = data_source.get_messages_from_channel(channel.id, date)
+    print(messages)
     file = data_source.create_log_file(messages, date)
+    print(file)
     await ctx.channel.send(
         content=f"Logs for {channel.name} on {date.strftime('%Y-%m-%d')}:",
         file=discord.File(file, filename="file.txt")

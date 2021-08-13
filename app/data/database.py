@@ -82,6 +82,7 @@ class PeeweeDataSource:
     def process_message_out(self, message: Message):
         output = ""
 
+        print(message.content)
         ordered_contents = message.content.order_by(MessageContent.timestamp.desc())
         current, previous = ordered_contents[0], ordered_contents[1:]
 
