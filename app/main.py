@@ -70,18 +70,18 @@ async def get_log_file(ctx: commands.Context, channel: discord.TextChannel,
         await ctx.channel.send(content=f"Invalid date. Dates should be formatted as YYYY-MM-DD.")
         return
 
-    # try:
-    messages = data_source.get_messages_from_channel(channel.id, date)
-    print(messages)
-    file = data_source.create_log_file(messages, date)
-    print(file)
-    await ctx.channel.send(
-        content=f"Logs for {channel.name} on {date.strftime('%Y-%m-%d')}:",
-        file=discord.File(file, filename="file.txt")
-    )
-    # except:
-    #     await ctx.channel.send("Could not retrieve logs. Are you using the right channel? Is the date correctly "
-    #                            "formatted? (YYYY-MM-DD)")
+    try:
+        messages = data_source.get_messages_from_channel(channel.id, date)
+        print(messages)
+        file = data_source.create_log_file(messages, date)
+        print(file)
+        await ctx.channel.send(
+            content=f"Logs for {channel.name} on {date.strftime('%Y-%m-%d')}:",
+            file=discord.File(file, filename="file.txt")
+        )
+    except:
+        await ctx.channel.send("Could not retrieve logs. Are you using the right channel? Is the date correctly "
+                               "formatted? (YYYY-MM-DD)")
 
     # todo Is there an error-specific way to handle this? Or a better way to handle params?
 
