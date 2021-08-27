@@ -10,7 +10,8 @@ import discord
 from discord.ext import commands
 import logging
 
-from data.database import PeeweeDataSource
+import logger
+from data import database
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -20,8 +21,6 @@ intents = discord.Intents.default()
 intents.members = True
 
 bot = commands.Bot(command_prefix=os.getenv("PREFIX", default="!"), description=description, intents=intents)
-
-data_source = PeeweeDataSource()
 
 
 @bot.event
@@ -37,12 +36,17 @@ async def on_ready():
 
 @bot.listen("on_message")
 async def log_on_message(message: discord.Message):
-    data_source.log_message(message)
+    database.log_message(message)
 
 
 @bot.listen("on_message_edit")
 async def log_on_message_edit(_, message: discord.Message):
-    data_source.log_message(message)
+    database.log_message(message)
+
+
+# @bot.listen("on_message_delete")
+# async def log_on_message_delete(message: discord.Message):
+#     database.log_message_deleted(message)
 
 
 @bot.listen("on_member_update")
@@ -50,7 +54,7 @@ async def update_member(before: discord.Member, after: discord.Member):
     if before.display_name != after.display_name \
             or before.name != after.name \
             or before.discriminator != after.discriminator:
-        data_source.update_user(after)
+        database.update_user(after)
 
 
 # todo Add a loading message for long-running operations
@@ -61,9 +65,11 @@ async def update_member(before: discord.Member, after: discord.Member):
              )
 async def get_log_file(ctx: commands.Context, channel: discord.TextChannel,
                        date_str: Optional[str] = datetime.now().strftime('%Y-%m-%d')):
+    # Checks
     if ctx.channel.id != int(os.getenv("LOG_CHANNEL")):
         return
 
+    # Validate datetime
     try:
         date = datetime.strptime(date_str, "%Y-%m-%d").date()
     except ValueError:
@@ -71,15 +77,12 @@ async def get_log_file(ctx: commands.Context, channel: discord.TextChannel,
         return
 
     try:
-        messages = data_source.get_messages_from_channel(channel.id, date)
-        print(messages)
-        file = data_source.create_log_file(messages, date)
-        print(file)
+        log_file = logger.get_log_file(channel.id, date)
         await ctx.channel.send(
             content=f"Logs for {channel.name} on {date.strftime('%Y-%m-%d')}:",
-            file=discord.File(file, filename="file.txt")
+            file=discord.File(log_file, filename=f"{channel.name}-{date.strftime('%Y-%m-%d')}.txt")
         )
-    except:
+    except:  # todo broad; add specific messages; allow on_command_error fallback?
         await ctx.channel.send("Could not retrieve logs. Are you using the right channel? Is the date correctly "
                                "formatted? (YYYY-MM-DD)")
 
@@ -92,13 +95,12 @@ async def on_command_error(ctx: commands.Context, error: commands.CommandError):
         if error.param.name == "channel":
             await ctx.channel.send("You must supply a channel name!")
     elif isinstance(error, commands.ChannelNotFound):
-        await ctx.channel.send(f"Channel `{error.argument}` not found. Valid channels will autocomplete.")
+        await ctx.channel.send(f"Channel {error.argument} not found. Valid channels will autocomplete.")
     else:
         print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
         traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
 
 if __name__ == "__main__":
-    data_source.setup_database()
-    print(os.getenv("TOKEN"))
+    database.setup_database()
     bot.run(os.getenv("TOKEN"))
