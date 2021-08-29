@@ -1,6 +1,7 @@
 import os
 
-from peewee import Model, CharField, ForeignKeyField, DateTimeField, SqliteDatabase, BigIntegerField, TextField
+from peewee import Model, CharField, ForeignKeyField, DateTimeField, SqliteDatabase, BigIntegerField, TextField, \
+    BooleanField
 
 database = SqliteDatabase(os.path.join("app", "database", "chat-logger.db"))
 
@@ -34,6 +35,7 @@ class Message(BaseModel):
     channel = ForeignKeyField(column_name='channel_id', model=TextChannel)
     timestamp = DateTimeField()
     jump_url = CharField()
+    was_deleted = BooleanField(default=False)
 
     class Meta:
         table_name = 'messages'

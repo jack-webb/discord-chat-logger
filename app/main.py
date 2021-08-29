@@ -10,7 +10,7 @@ import discord
 from discord.ext import commands
 import logging
 
-import logger
+import formatter
 from data import database
 
 logging.basicConfig(level=logging.DEBUG)
@@ -44,9 +44,9 @@ async def log_on_message_edit(_, message: discord.Message):
     database.log_message(message)
 
 
-# @bot.listen("on_message_delete")
-# async def log_on_message_delete(message: discord.Message):
-#     database.log_message_deleted(message)
+@bot.listen("on_message_delete")
+async def log_on_message_delete(message: discord.Message):
+    database.log_message_deleted(message)
 
 
 @bot.listen("on_member_update")
@@ -77,7 +77,7 @@ async def get_log_file(ctx: commands.Context, channel: discord.TextChannel,
         return
 
     try:
-        log_file = logger.get_log_file(channel.id, date)
+        log_file = formatter.get_log_file(channel.id, date)
         await ctx.channel.send(
             content=f"Logs for {channel.name} on {date.strftime('%Y-%m-%d')}:",
             file=discord.File(log_file, filename=f"{channel.name}-{date.strftime('%Y-%m-%d')}.txt")

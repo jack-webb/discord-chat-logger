@@ -38,10 +38,14 @@ def process_message_out(message: Message):
     ordered_contents = list(reversed(sorted(message.content, key=lambda x: x.timestamp)))
     current, previous = ordered_contents[0], ordered_contents[1:]
 
+    was_deleted = ""
+    if message.was_deleted:
+        was_deleted = " DELETED"
+
     if str(message.author.nickname) == f"{message.author.username}":
-        output += f"[{message.timestamp.strftime('%H:%M:%S')}] {message.author.username}#{message.author.discriminator}: {current.text} {current.attachment_url}"
+        output += f"[{message.timestamp.strftime('%H:%M:%S')}] {message.author.username}#{message.author.discriminator}{was_deleted}: {current.text} {current.attachment_url}"
     else:
-        output += f"[{message.timestamp.strftime('%H:%M:%S')}] {message.author.username}#{message.author.discriminator} ({message.author.nickname}): {current.text} {current.attachment_url}"
+        output += f"[{message.timestamp.strftime('%H:%M:%S')}] {message.author.username}#{message.author.discriminator} ({message.author.nickname}){was_deleted}: {current.text} {current.attachment_url}"
 
     for content in previous:
         relative_time = current.timestamp - content.timestamp

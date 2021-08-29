@@ -34,7 +34,8 @@ def log_message(message: discord.Message):
             "author": user,
             "channel": text_channel,
             "timestamp": message.created_at,
-            "jump_url": message.jump_url
+            "jump_url": message.jump_url,
+            "was_deleted": False
         })
 
     embed_json = ""
@@ -60,8 +61,9 @@ def log_message(message: discord.Message):
 
 
 def log_message_deleted(message: discord.Message):
-    msg = Message.get()
-    pass
+    msg = Message.get_by_id(message.id)
+    msg.was_deleted = True
+    msg.save()
 
 
 def update_user(user: discord.Member):
